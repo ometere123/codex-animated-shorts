@@ -9,7 +9,16 @@ Create original, visually readable cartoon stories. Use the supplied bridge sour
 
 ## Resource map
 
-Resolve the skill directory from this SKILL.md file, not from the user's working directory:
+Repository-scoped installation: this file lives at `.agents/skills/codex-animated-shorts/SKILL.md`.
+Resolve the repository root as `../../..` from that skill directory. All resource paths below
+are relative to that repository root. The root SKILL.md is a synchronized distribution copy.
+
+For this repository in Codex Cloud, read `docs/CLOUD.md` first. Run `bash scripts/cloud-setup.sh`,
+then `npm run cloud:verify` for the four-second technical test. Do not create another project
+or use unpinned installs for this repository. Existing bootstrap instructions below apply to
+exporting the template into other projects.
+
+Resource map:
 
 - templates/bridge/ — original 1831 bridge composition: camera/story, scene, 2D billboards, shading, ink, blur, grade.
 - templates/remotion/ — standalone bridge composition entry and registration for a Remotion project.
@@ -31,9 +40,9 @@ Read the relevant source files and reports for the part being changed. Do not lo
 
 4. To introduce the bridge example into an existing Remotion project without replacing its entrypoint, run:
 
-       node <skill-dir>/scripts/bootstrap-remotion.mjs <remotion-project-path>
+       node <repo-root>/scripts/bootstrap-remotion.mjs <remotion-project-path>
 
-   This creates src/bridge-entry.ts, src/BridgeRoot.tsx, src/videos/bridge/, and scripts/. It refuses conflicting files.
+   This creates src/bridge-entry.ts, src/BridgeRoot.tsx, src/videos/bridge/, scripts/, and audio/. It refuses conflicting files.
 5. From the Remotion project, install matching Remotion packages and Three.js dependencies:
 
        npx remotion add @remotion/three @remotion/bundler @remotion/renderer
@@ -65,7 +74,7 @@ Read the relevant source files and reports for the part being changed. Do not lo
 2. Target approximately 3.5–4 spoken words per second. Confirm the actual script length against the requested duration.
 3. Prepare SCRIPT.md and a shot table: start/end time, narration, action, characters, camera, effect, audio cue, evidence for factual claims. Separate dialogue from narration.
 4. Preserve the user's language preferences. Captions, logos, voice timbre, humour intensity, and music style are choices, **not inherited universal rules** from the bridge example.
-5. Show the script/storyboard to the user and wait for approval when requested. Do not begin the expensive full render before the agreed review gates.
+5. Show the script/storyboard to the user and wait for explicit script and storyboard approval. Do not begin the expensive full render before the agreed review gates.
 
 ## Stage 3 — build the animation
 
@@ -86,7 +95,7 @@ Read the relevant source files and reports for the part being changed. Do not lo
 
 1. Render a few representative stills, including faces, wide views, lighting changes, and action peaks. Inspect them and fix cut-off props, false depth cues, unreadable gestures, harsh clipping, and shots that do not tell the story.
 2. The copied scripts/bridge-stills.mjs accepts an output prefix, comma-separated frames and scale; select another entry or composition using REMOTION_ENTRY and REMOTION_COMPOSITION. Set REMOTION_BROWSER_EXECUTABLE only when auto-detection fails. Do not assume Windows paths.
-3. Render a short low-resolution video preview. Show or link the actual playable result and summarize known limitations; request approval before the final high-resolution render when that is the user's chosen workflow.
+3. Render a short low-resolution video preview. Show or link the actual playable result and summarize known limitations; request approval before the final high-resolution render as a mandatory production checkpoint.
 4. Once approved, render the final vertical MP4. For the original example:
 
        npx remotion render src/bridge-entry.ts BridgeShort out/bridge-video.mp4 --codec h264 --crf 16 --scale 1.3333
@@ -94,6 +103,21 @@ Read the relevant source files and reports for the part being changed. Do not lo
    A new story uses its own composition ID and entrypoint. Mux the approved audio with FFmpeg as necessary; check that only the desired tracks are selected.
 5. Run frame/audio QA (templates/scripts/short_qa.py as adapted), inspect representative images, confirm duration/resolution/FPS, and check dialogue against the factual script. If any check fails, fix and rerun it.
 6. Provide the final MP4 and project files using the available file-delivery mechanism. State truthfully what was rendered, what was inspected, and whether any dependencies or assets were missing.
+
+## Production approval gates
+
+Always wait for approval of (1) story selection, (2) script/storyboard, and (3) actual playable
+preview before final production. Record approval dates and approved revision hashes in
+`productions/<slug>/APPROVALS.md`. Technical smoke tests are authorized by setup requests;
+they do not authorize a full story. Research must include a claim/source table, at least two
+independent credible sources for consequential political claims where available, dates and
+access dates, and disputed-status notes. Use original comic situations, distinguish documented
+facts from invented jokes, and never manufacture quotations.
+
+Render sources belong in src/videos/<slug>; outputs, audio stems and temporary files must stay
+in ignored output/work directories. Keep licensed asset provenance in productions/<slug>/ASSETS.md.
+Deliver preview and final files through available task artifacts or the GitHub Actions artifact
+workflow in docs/CLOUD.md. Never promise that ephemeral workspace links persist.
 
 ## Operational safeguards
 

@@ -26,6 +26,7 @@ if (!fs.existsSync(path.join(projectRoot, "package.json"))) {
 const mappings = [
   ["templates/bridge", "src/videos/bridge"],
   ["templates/scripts", "scripts"],
+  ["templates/audio", "audio"],
   ["templates/remotion/bridge-entry.ts", "src/bridge-entry.ts"],
   ["templates/remotion/BridgeRoot.tsx", "src/BridgeRoot.tsx"],
 ];
@@ -34,6 +35,7 @@ function queueFiles(source, target) {
   const stat = fs.statSync(source);
   if (stat.isDirectory()) {
     for (const entry of fs.readdirSync(source)) {
+      if (entry === "__pycache__" || entry.endsWith(".pyc")) continue;
       queueFiles(path.join(source, entry), path.join(target, entry));
     }
     return;

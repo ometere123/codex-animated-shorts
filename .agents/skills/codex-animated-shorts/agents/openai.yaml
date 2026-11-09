@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Animated Shorts"
+  short_description: "Produce original 2D-in-3D story animations"
+  default_prompt: "Use $codex-animated-shorts to plan and preview an original 60-second vertical animated story."
