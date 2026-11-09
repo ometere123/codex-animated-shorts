@@ -1,0 +1,16 @@
+node_modules/
+.venv/
+.cache/
+.tmp/
+out/
+src/videos/bridge/
+src/BridgeRoot.tsx
+src/bridge-entry.ts
+__pycache__/
+*.pyc
+audio/
+scripts/bridge-stills.mjs
+scripts/bridge_merge.py
+scripts/bridge_shots.py
+scripts/sbs_sheet.py
+scripts/short_qa.py

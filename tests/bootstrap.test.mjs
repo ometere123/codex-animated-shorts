@@ -21,6 +21,7 @@ test("scaffolds, repeats safely, and refuses to overwrite changes", (t) => {
   assert.ok(fs.existsSync(path.join(target, "src/BridgeRoot.tsx")));
   assert.ok(fs.existsSync(path.join(target, "src/bridge-entry.ts")));
   assert.ok(fs.existsSync(path.join(target, "scripts/bridge-stills.mjs")));
+  assert.ok(fs.existsSync(path.join(target, "audio/mix.py")));
 
   const second = run();
   assert.equal(second.status, 0, second.stderr);
