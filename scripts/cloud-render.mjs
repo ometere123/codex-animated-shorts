@@ -1,6 +1,7 @@
 // Reproducible technical smoke test. This is not a story or final-render approval.
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import {execFileSync} from 'node:child_process';
 import {probeWebGL} from './webgl-probe.mjs';
 import {bundle} from '@remotion/bundler';
@@ -11,9 +12,11 @@ if (![360,540,1080,1440].includes(width)) throw new Error('PREVIEW_WIDTH must be
 const height = width * 16 / 9;
 const out = path.resolve(process.env.OUTPUT_DIR || 'out/cloud-smoke');
 fs.mkdirSync(out, {recursive:true});
-const tempRoot = path.resolve('.tmp');
+// Chromium uses Unix sockets with a ~108-byte path limit; deep checkout paths fail.
+const tempRoot = path.resolve(process.env.REMOTION_TMP_BASE || (process.platform === 'win32' ? os.tmpdir() : '/tmp'));
+if (Buffer.byteLength(tempRoot) > 50) throw new Error('REMOTION_TMP_BASE must be a short path (50 bytes or fewer) for Chromium sockets');
 fs.mkdirSync(tempRoot,{recursive:true});
-const scratch = fs.mkdtempSync(path.join(tempRoot,'render-'));
+const scratch = fs.mkdtempSync(path.join(tempRoot,'cas-'));
 process.env.TMPDIR = process.env.TEMP = process.env.TMP = scratch;
 let browser;
 let stopping = false;

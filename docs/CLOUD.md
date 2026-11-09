@@ -93,8 +93,10 @@ sandbox policy files. A fresh environment must be tested again. If its outer
 runtime also blocks Chromium, use the manual GitHub Actions workflow below, or
 another explicitly approved cloud renderer. Compilation alone is not a render.
 
-Each run owns a unique `.tmp/render-*` directory and removes it in `finally`.
-SIGINT/SIGTERM are handled; a killed VM may leave a directory. Inspect `.tmp`
+Each run owns a unique short `/tmp/cas-*` directory and removes it in `finally`.
+A short temp base avoids Chromium Unix socket path limits in deeply nested
+checkouts. `REMOTION_TMP_BASE` may select another short writable directory.
+SIGINT/SIGTERM are handled; a killed VM may leave a directory. Inspect the selected temp base
 before removing stale run directories. Never clean someone else's work. Output
 files deliberately survive; download them, then delete only selected old runs.
 The fixed default output directory is overwritten on reruns; use a unique

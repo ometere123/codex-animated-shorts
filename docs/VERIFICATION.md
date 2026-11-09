@@ -63,5 +63,9 @@ integrated runner on a clean Linux host.
 
 The GitHub Actions workflow is a second, clean-runner verification and downloadable
 artifact route: https://github.com/ometere123/codex-animated-shorts/actions/runs/42613629580
-Its result and artifact URL will be recorded after the PR run completes.
+The initial clean runner failed because a deeply nested checkout made Chromium's
+Unix socket path exceed its length limit. The renderer now uses a short owned
+`/tmp/cas-*` scratch directory (configurable with REMOTION_TMP_BASE) rather than
+placing browser temp data under the checkout. A fresh run verifies the fix;
+its final result and artifact URL will be recorded here.
 No external paid services, credentials or storage buckets were introduced.
