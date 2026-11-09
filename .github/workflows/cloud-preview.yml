@@ -14,6 +14,9 @@ jobs:
   smoke:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      PIP_CACHE_DIR: ${{ github.workspace }}/.cache/pip
+      NPM_CONFIG_CACHE: ${{ github.workspace }}/.cache/npm
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
