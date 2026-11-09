@@ -1,33 +1,88 @@
-# Claude Animated Shorts
+# Codex Animated Shorts
 
-The free Claude skill from the video **"How to Make Viral Animated Shorts Using Claude (Full Workflow)"**.
+An independent Codex adaptation of [mromidev/claude-animated-shorts](https://github.com/mromidev/claude-animated-shorts). It guides Codex through researching, scripting, building, reviewing, and rendering original animated story shorts with flat 2D cartoon characters in a stylized 3D world.
 
-It makes 55-70 s vertical animated story shorts: 2D characters in a colourful 3D world, with ink outlines, a painted town, lens blur, gliding cameras, a march score and sound effects. Everything is rendered with three.js inside Remotion on your own PC, with no AI video generator.
+Built around Three.js, React Three Fiber, and [Remotion](https://www.remotion.dev/). No AI video generation service is required; rendering happens on a machine with the necessary dependencies.
 
-Proven on **The Bridge That Fell for a Song**, a 67 s short about the 1831 Broughton bridge.
+**This is a Codex skill and a reusable source template, not a one-click video generator.** The 1831 bridge example has story-specific code and audio. New topics require new animation work.
 
-## What's inside
-| Path | What it is |
+## Install the Codex skill
+
+Requires Git and Codex. Put the repository directly under your personal Codex skills directory:
+
+macOS / Linux:
+
+    mkdir -p ~/.agents/skills
+    git clone https://github.com/ometere123/codex-animated-shorts.git ~/.agents/skills/codex-animated-shorts
+
+Windows PowerShell:
+
+    New-Item -ItemType Directory -Force "$HOME/.agents/skills"
+    git clone https://github.com/ometere123/codex-animated-shorts.git "$HOME/.agents/skills/codex-animated-shorts"
+
+Alternatively, clone it under a project's .agents/skills/codex-animated-shorts/ directory to make it project-scoped. Its entry point is the root SKILL.md; the matching skill name is **codex-animated-shorts**.
+
+Invoke in Codex:
+
+> Use $codex-animated-shorts to research three funny, verified moments in Nigerian political history. Let me choose one, then draft a 60-second script and storyboard. Wait for approval before rendering a preview.
+
+## First project: bootstrap the bridge example
+
+Install Node.js, npm, Python 3, and FFmpeg first. Have enough disk space for a 3D Remotion render.
+
+1. Create a blank Remotion project:
+
+       npx create-video@latest --yes --blank animated-shorts
+       cd animated-shorts
+
+2. Run the skill's non-destructive setup helper, replacing SKILL_DIR with the directory where you installed this repository:
+
+       node SKILL_DIR/scripts/bootstrap-remotion.mjs .
+
+   This copies the bridge code into src/videos/bridge/, adds a separate src/bridge-entry.ts and src/BridgeRoot.tsx, and copies the rendering/QA helpers to scripts/. It never overwrites conflicting existing files. Running it twice is safe when files have not been modified.
+
+3. Install the required packages from inside the Remotion project:
+
+       npx remotion add @remotion/three @remotion/bundler @remotion/renderer
+       npm install three @react-three/fiber @react-three/postprocessing postprocessing
+       npm install -D @types/three
+
+   Remotion package versions should match. Use a compatible Node.js release and resolve any peer dependency conflicts.
+
+4. Try the composition:
+
+       npx remotion studio src/bridge-entry.ts
+       npx remotion still src/bridge-entry.ts BridgeShort out/bridge-preview.png --frame=90
+
+   For automated JPEG stills:
+
+       node scripts/bridge-stills.mjs out/bridge/frame- 90,240,600 0.5
+
+5. Ask Codex to inspect the rendered sample, fix any compatibility problems, and create your own story-specific composition. For final output, render that new composition ID, add the original or appropriately licensed voice/music/SFX, and perform QA.
+
+### Known limitations
+
+- The original example optionally loads Kenney 3D models from public/bridge/kenney/. Those GLB assets are **not in this repository**; missing files are skipped, but the example will not fully match the author's original scene. Add properly licensed models or procedural replacements.
+- The Python files under templates/audio/ are specific to the original 67.5-second bridge story. They must be adapted to a new script, timestamps, duration, and cue sheet. Install NumPy/SciPy if using them.
+- The original render helper assumed a Windows Chrome executable. The Codex fork allows Chromium auto-detection and accepts REMOTION_BROWSER_EXECUTABLE when needed.
+- A full preview or final MP4 is not guaranteed until dependencies, assets, and rendering have been verified on your machine. The skill separates script approval, preview approval, and final rendering.
+- Reference frames and contact sheets are supplied for **private style analysis only**. Do not republish or trace those frames, characters, scripts, or shots.
+
+## Repository contents
+
+| Location | Purpose |
 |---|---|
-| `SKILL.md` | The skill: the full pipeline, every rule, every fix, and the final look values |
-| `templates/bridge/` | The full source of the bridge short: world, characters, ink, lens blur, grade, story/camera |
-| `templates/audio/` | The synthesized sound: SFX, march music, the mix with ducking and loudness |
-| `templates/scripts/` | Stills, side-by-side sheets, shot merge and frame-by-frame QA helpers |
-| `references/STYLE_BIBLE.md` | The script and visual formula measured from 20 reference shorts |
-| `references/reports/` | Seven measured reports: motion, depth, textures, characters, lighting, outlines, grade |
-| `references/frames/` | 38 full-size reference frames (540x960) to compare your frames against |
-| `references/sheets/` | 20 contact sheets, one per reference short, 60 frames each (1,200 frames) |
+| SKILL.md | Codex workflow, safety/approval gates, setup, and QA |
+| agents/openai.yaml | Codex skill display name and starter prompt |
+| scripts/bootstrap-remotion.mjs | Safe example integration into a Remotion project |
+| templates/remotion/ | Standalone example composition registration |
+| templates/bridge/ | Original bridge 2D/3D scene, characters, camera, and effects |
+| templates/scripts/ | Stills, QA, source utilities (some bridge-specific) |
+| templates/audio/ | Original bridge-specific synthesized audio workflow |
+| references/STYLE_BIBLE.md | Format and storytelling observations |
+| references/reports/ | Technical visual measurements |
+| references/frames/, references/sheets/ | Private visual study materials |
 
-## Install
-1. Copy this folder to `~/.claude/skills/cartoon-3d-short/` (clone it there, or download the ZIP).
-2. You need [Remotion](https://www.remotion.dev/) with `@remotion/three`, plus Node, Python 3 and ffmpeg.
-3. In Claude Code, say: *"Use the cartoon short skill and make a short about …"*.
+## Credits and license
 
-Claude then follows `SKILL.md`: topic and facts, then script, then voice, then the shot plan in `story.ts`, then stills, then renders. Agents check your frames against the reports and the frames, and you get the final 2K render and sound mix.
-
-## Notes
-- Set `REMOTION_TMP` to a folder on a big drive. Every Remotion bundle copies `public/` (~1.3 GB) into the temp folder.
-- Story, characters and voice should always be your own. Use the references for the look, not the content.
-
-## License
-The code and docs are MIT (see `LICENSE`). The reference frames are included for style study only.
+Based on the MIT-licensed source by [mromidev](https://github.com/mromidev/claude-animated-shorts), with Codex-oriented workflows, project bootstrap, portable still rendering, and documentation added in this fork. The code/documentation remain under the repository's MIT [LICENSE](LICENSE); the reference media are for study only.
