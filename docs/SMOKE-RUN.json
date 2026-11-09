@@ -1,0 +1,10 @@
+{
+  "elapsedSeconds": 361.504,
+  "width": 360,
+  "height": 640,
+  "frames": 120,
+  "concurrency": 1,
+  "gl": "swangle",
+  "effects": "original defaults retained",
+  "audio": "synthetic timing cue, no narration"
+}

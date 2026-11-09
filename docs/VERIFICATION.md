@@ -6,6 +6,7 @@ Baseline commit: f6fdfc6f5f043f1ce8e5ce8be075dfe4bdabe225.
 | Check | Observed result |
 |---|---|
 | Repository skill discovery | Codex app-server skills/list returns codex-animated-shorts, scope repo, enabled true, no discovery errors |
+| ANGLE comparison | Plain angle mode could not create WebGL2; swangle succeeded |
 | Phone UI invocation | Not independently exercised on an iPhone; use the fresh-task prompt in CLOUD.md |
 | Fresh npm install | npm ci from package-lock.json passed; no peer overrides |
 | Fresh Python venv | NumPy 2.3.5, SciPy 1.17.0, Pillow 13.0.0 installed successfully |
@@ -61,11 +62,50 @@ were integrated. The same WebGL probe, media verifier and updated QA were then
 executed independently against the actual output. The PR workflow runs the
 integrated runner on a clean Linux host.
 
-The GitHub Actions workflow is a second, clean-runner verification and downloadable
-artifact route: https://github.com/ometere123/codex-animated-shorts/actions/runs/42613629580
-The initial clean runner failed because a deeply nested checkout made Chromium's
-Unix socket path exceed its length limit. The renderer now uses a short owned
-`/tmp/cas-*` scratch directory (configurable with REMOTION_TMP_BASE) rather than
-placing browser temp data under the checkout. A fresh run verifies the fix;
-its final result and artifact URL will be recorded here.
-No external paid services, credentials or storage buckets were introduced.
+Independent clean-runner verification:
+https://github.com/ometere123/codex-animated-shorts/actions/runs/42613944538
+
+- Setup, strict compilation/tests, integrated render/audio/media/streaming QA,
+  and upload-artifact steps all **passed** on Ubuntu 24.04 with Node 22/Python 3.12.
+- Renderer elapsed time: **562.34 seconds**, concurrency 1, swangle, 360×640,
+  120 frames. Original effects retained. Same media specs and cue timing as above.
+- Artifact **animated-shorts-preview**, ID **13671953497**, ZIP **4,561,923 bytes**,
+  expires **2026-11-16 12:14:33 UTC**.
+- Downloaded through the connected GitHub artifact tool, unpacked and independently
+  decoded/verified the MP4; inspected its frame. The ordinary gh redirect download
+  returned 403 in this cloud environment; the connector download worked. Use the
+  GitHub artifact page in an authenticated phone browser for the reusable route.
+- Downloaded video SHA-256:
+  `f8da1a5e7b21222ede42455d5845497acb154b02d3b0b370b673aeb814cfd752`.
+- The overall run was marked failed **after** successful rendering/upload because
+  setup-python's post-job cache looked for ~/.cache/pip while setup used .cache/pip.
+  The workflow now explicitly shares PIP_CACHE_DIR and NPM_CONFIG_CACHE with the
+  setup script. The final complete run below verified cache saving as well as rendering.
+
+Two earlier clean-runner attempts failed at Chromium launch: the deeply nested
+checkout made Chromium's Unix socket path exceed its length limit. The renderer
+now uses a short owned `/tmp/cas-*` scratch directory (REMOTION_TMP_BASE override).
+The completed clean-runner render above proves that fix. No visual effects were
+removed. No external paid services, credentials or storage buckets were introduced.
+
+## Final complete workflow result
+
+**PASS** — https://github.com/ometere123/codex-animated-shorts/actions/runs/42615622206
+
+Tested runtime/workflow commit: `8db7273c1c41d4814b7d50a39b32c9169bca1588`.
+Every step passed, including npm and pip cache saving. Total job time **6m57s**;
+the integrated render/probe/audio/QA runner took **361.504s**. Output remains
+360×640, 30 fps, 120 frames, 4.000000s H.264/AAC. All eight encoded cue peak offsets
+are +0.000604167s. Streaming QA reported no black/white/frozen/spike failures.
+
+Download: https://github.com/ometere123/codex-animated-shorts/actions/runs/42615622206/artifacts/13672164272
+
+Artifact ID **13672164272**, ZIP **4,561,922 bytes**, expires
+**2026-11-16 12:23:15 UTC**. Downloaded the final artifact through the connector,
+unpacked it, and independently repeated FFprobe assertions and full FFmpeg decode.
+Its video SHA-256 is identical to the previous clean-runner output:
+`f8da1a5e7b21222ede42455d5845497acb154b02d3b0b370b673aeb814cfd752`.
+The code changes are verified; subsequent report-only commits do not change the
+rendering pipeline. No remaining blocker for this four-second cloud preview.
+Full-minute/2K performance, production assets/narration and actual iPhone UI
+interaction remain outside this technical test's evidence.

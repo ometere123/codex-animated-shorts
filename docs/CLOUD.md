@@ -80,7 +80,8 @@ command always renders four seconds; it never approves or renders a full story.
 
 `REMOTION_GL=swangle` is the default software renderer (ANGLE + SwiftShader).
 `REMOTION_BROWSER_EXECUTABLE=/path/to/chromium` selects a browser if needed.
-`REMOTION_GL=angle` is an optional comparison, not a guaranteed GPU route. The
+`REMOTION_GL=angle` failed the WebGL2 probe on the tested executor; keep swangle
+there. ANGLE alone is not a guaranteed GPU route. The
 runner uses one render worker; do not automatically scale to CPU count. The test
 container has a 2-CPU quota, 8 GiB memory limit and approximately 8 GiB disk.
 Software shader compilation is slow. Keep at least 3 GiB disk free, inspect usage
@@ -115,8 +116,9 @@ workflow in `.github/workflows/cloud-preview.yml` runs on relevant pull requests
 and manual dispatch. It renders the smoke test and
 uploads the files for seven days. After the workflow is on the default branch,
 open GitHub in Safari → repository → Actions → Cloud preview artifact → Run
-workflow → choose branch → Run. Open the completed run → Artifacts →
-`animated-shorts-preview`; download the ZIP and expand it in Files. Actions may
+workflow → choose branch → Run. Sign in to GitHub in Safari. Open the completed run → Artifacts →
+`animated-shorts-preview`; download the ZIP and expand it in Files. If the mobile layout hides artifact
+controls, use Safari’s Request Desktop Website. Actions may
 consume account minutes/storage; no paid storage service has been provisioned.
 This workflow is limited to the technical smoke test and does not generate a
 story or bypass its approvals. Only runs listed in the
@@ -175,3 +177,11 @@ once (avoid independent AAC padding at every shot). Confirm no missing/duplicate
 frames at joins and repeat full-decode/spec/audio QA. Adapt `short_qa.py` to the new
 shot table; it streams low-resolution frames and creates contact sheets. It flags
 potential issues but does not establish factual accuracy or artistic quality.
+
+A verified downloadable preview is available from the run linked in
+[VERIFICATION.md](VERIFICATION.md). Its artifact expires after seven days. In the
+current cloud executor, `gh run download` received a 403 from its redirect target;
+the connected GitHub artifact-download tool successfully delivered the ZIP. This
+does not prevent downloading through GitHub in Safari. If the Codex task cannot
+attach files directly, return the Actions run/artifact link rather than promising
+that a raw workspace path is a phone download.
