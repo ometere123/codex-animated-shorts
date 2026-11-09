@@ -2,9 +2,9 @@
 Requires a Codex runtime whose state directory is writable. stdout contains only
 this repository skill's metadata; no credentials are read or printed.
 """
-import json, pathlib, select, subprocess, time
+import json, os, pathlib, select, subprocess, time
 root = pathlib.Path(__file__).resolve().parents[1]
-p = subprocess.Popen(['codex','app-server','--listen','stdio://'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1,cwd=root)
+p = subprocess.Popen(['codex','app-server','--listen','stdio://'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1,cwd=root,env={**os.environ,'RUST_LOG':'error'})
 def send(value):
     p.stdin.write(json.dumps(value)+'\n'); p.stdin.flush()
 try:
